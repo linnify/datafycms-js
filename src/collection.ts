@@ -1,7 +1,7 @@
-import axios, { AxiosError } from 'axios';
 import { Filter, Operator, PaginatedRecords } from './types';
+import { DatafyRequest } from './datafycms';
 
-export class Collection<T> {
+export class Collection<T> extends DatafyRequest {
   private _fields: string[] = [];
   private _filters: Map<string, Filter> = new Map([]);
   private _search: string;
@@ -9,10 +9,16 @@ export class Collection<T> {
   private _pageSize = 20;
   // private _hasNext: boolean;
 
-  private constructor(private collection: string) {}
+  private constructor(private collection: string) {
+    super();
+  }
 
   static createInstance<T>(collection: string): Collection<T> {
     return new Collection<T>(collection);
+  }
+
+  private baseUrl() {
+    return `collections/${this.collection}`;
   }
 
   fields(fields: string[]): Collection<T> {
@@ -48,6 +54,13 @@ export class Collection<T> {
     return this;
   }
 
+  record(recordId: string): CollectionRecord<T> {
+    const record = new CollectionRecord<T>(this.collection, recordId);
+    record.fields(this._fields);
+
+    return record;
+  }
+
   /*  loadPrevious(): Promise<PaginatedRecords<T>> {
       if (this._page <= 1) {
         throw new Error('Cannot load page 0')
@@ -66,7 +79,7 @@ export class Collection<T> {
    * Return the Full URL based on filter, fields, page and page size
    */
   url(): string {
-    let url = `/collections/${this.collection}?page=${this._page}&pageSize=${this._pageSize}`;
+    let url = `${this.baseUrl()}?page=${this._page}&pageSize=${this._pageSize}`;
 
     if (this._fields.length > 0) {
       const fields = this._fields.join(',');
@@ -91,11 +104,60 @@ export class Collection<T> {
    * Load resources based on current configuration
    */
   async list(): Promise<PaginatedRecords<T>> {
-    return axios(this.url(), {
-      method: 'GET',
-      headers: {
-        'X-API-TOKEN': '',
-      },
-    }).then((response) => response.data);
+    return this.request<PaginatedRecords<T>>(this.url(), 'GET');
+  }
+
+  async create(data: T): Promise<T> {
+    return this.request<T>(this.url(), 'POST', data);
+  }
+}
+
+export class CollectionRecord<T> extends DatafyRequest {
+  private _fields: string[] = [];
+
+  constructor(private collection: string, private record: string) {
+    super();
+  }
+
+  private baseUrl() {
+    return `collections/${this.collection}/records/${this.record}`;
+  }
+
+  getFields(): string[] {
+    return this._fields;
+  }
+
+  fields(fields: string[]): CollectionRecord<T> {
+    this._fields = fields;
+    return this;
+  }
+
+  url(): string {
+    let url = this.baseUrl();
+
+    if (this._fields.length > 0) {
+      const fields = this._fields.join(',');
+      url += `&datafy_fields=${fields}`;
+    }
+
+    return url;
+  }
+
+  get(): Promise<T> {
+    return this.request<T>(this.url(), 'GET');
+  }
+
+  async delete(): Promise<void> {
+    return this.request<void>(this.baseUrl(), 'DELETE');
+  }
+
+  publish(): Promise<T> {
+    const url = `${this.baseUrl()}/publish`;
+    return this.request<T>(url, 'POST', {});
+  }
+
+  draft(): Promise<T> {
+    const url = `${this.baseUrl()}/draft`;
+    return this.request<T>(url, 'POST', {});
   }
 }

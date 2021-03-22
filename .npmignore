@@ -1,0 +1,7 @@
+.travis.yml
+.eslintrc
+__tests__
+.husky
+coverage
+tsconfig.json
+jest*

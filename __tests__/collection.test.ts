@@ -2,10 +2,11 @@ import { Collection } from '../src/collection';
 import { Filter, Operator } from '../src/types';
 
 describe('Test Collection', () => {
+  const collectionId = 'test';
   let collection: Collection<never>;
 
   beforeEach(() => {
-    collection = Collection.createInstance('test');
+    collection = Collection.createInstance(collectionId);
   });
 
   it('Should set fields with specific url', () => {
@@ -70,5 +71,42 @@ describe('Test Collection', () => {
     expect(() => {
       collection.page(page);
     }).toThrow('Cannot set a page les then 1');
+  });
+
+  it('Should generate record with the right fields', () => {
+    const recordId = 'recordId';
+    const fields = ['field1', 'field2'];
+
+    const record = collection.fields(fields).record(recordId);
+
+    expect(record.getFields()).toEqual(fields);
+  });
+
+  it('Should return the base url', () => {
+    const expectedUrl = `collections/${collectionId}?page=1&pageSize=20`;
+    expect(collection.url()).toEqual(expectedUrl);
+  });
+});
+
+describe('Test Collection Record', () => {
+  const collectionId = 'test';
+  let collection: Collection<never>;
+
+  beforeEach(() => {
+    collection = Collection.createInstance(collectionId);
+  });
+
+  it('Should return the base url', () => {
+    const recordId = 'recordId';
+    const record = collection.record(recordId);
+
+    expect(record.url()).toEqual(`collections/${collectionId}/records/${recordId}`);
+  });
+
+  it('Should add fields in URL', () => {
+    const recordId = 'recordId';
+    const record = collection.record(recordId);
+
+    expect(record.url()).toEqual(`collections/${collectionId}/records/${recordId}`);
   });
 });
