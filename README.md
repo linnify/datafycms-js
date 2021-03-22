@@ -1,5 +1,6 @@
 # DatafyCMS JavaScript Client
 
+[![npm version](https://img.shields.io/npm/v/@datafycms/js-client)](https://www.npmjs.com/package/@datafycms/js-client)
 [![codecov](https://codecov.io/gh/linnify/datafycms-js/branch/main/graph/badge.svg)](https://codecov.io/gh/linnify/datafycms-js)
 [![Build Status](https://travis-ci.com/linnify/datafycms-js.svg?branch=main)](https://travis-ci.com/linnify/datafycms-js)
 
