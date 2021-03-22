@@ -1,4 +1,4 @@
-# datafycms-js
+# DatafyCMS JS Client
 JS API Client for DatafyCMS
 
 
