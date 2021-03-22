@@ -4,15 +4,16 @@ export class DatafyCMS {
   private static API_TOKEN: string;
 
   static setupAPI(apiToken: string): void {
-    DatafyCMS.API_TOKEN = apiToken || (process.env.DATAFYCMS_API_TOKEN as string);
+    DatafyCMS.API_TOKEN = apiToken;
   }
 
   static getToken(): string {
-    if (!DatafyCMS.API_TOKEN) {
+    const token = DatafyCMS.API_TOKEN || (process.env.DATAFYCMS_API_TOKEN as string);
+    if (!token) {
       throw 'API Token is not set';
     }
 
-    return DatafyCMS.API_TOKEN;
+    return token;
   }
 
   static authHeader(): { [id: string]: string } {
