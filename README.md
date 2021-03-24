@@ -77,6 +77,8 @@ class Post {
 
 const response = await datafyCMS.collections<Post>('posts')
   .fields(['title', 'created_at'])
+  .page(2)  // specify the page number, by default is 1
+  .pageSize(8) // specify the page size, by default is 20
   .filterBy('created_at', Operator.GT, '2020-10-20')
   .filterBy('views', Operator.LTE, 120)
   .search('search in the content post')
