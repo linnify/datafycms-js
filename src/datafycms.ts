@@ -1,5 +1,9 @@
 import axios, { AxiosResponse, Method } from 'axios';
 
+export const setup = (token: string): void => {
+  DatafyCMS.setupAPI(token);
+};
+
 export class DatafyCMS {
   private static API_TOKEN: string;
 

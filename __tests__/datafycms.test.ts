@@ -1,4 +1,4 @@
-import { DatafyCMS } from '../src/datafycms';
+import { DatafyCMS } from '../src';
 
 describe('Test DatafyCMS', () => {
   const token = '123';

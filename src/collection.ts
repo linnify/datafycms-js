@@ -1,13 +1,16 @@
 import { Filter, Operator, PaginatedRecords } from './types';
 import { DatafyRequest } from './datafycms';
 
+export const collections = <T>(collection: string): Collection<T> => {
+  return Collection.createInstance<T>(collection);
+};
+
 export class Collection<T> extends DatafyRequest {
   private _fields: string[] = [];
   private _filters: Map<string, Filter> = new Map([]);
   private _search: string;
   private _page = 1;
   private _pageSize = 20;
-  // private _hasNext: boolean;
 
   private constructor(private collection: string) {
     super();
@@ -18,7 +21,7 @@ export class Collection<T> extends DatafyRequest {
   }
 
   private baseUrl() {
-    return `collections/${this.collection}`;
+    return `collections/${this.collection}/records`;
   }
 
   fields(fields: string[]): Collection<T> {
@@ -60,20 +63,6 @@ export class Collection<T> extends DatafyRequest {
 
     return record;
   }
-
-  /*  loadPrevious(): Promise<PaginatedRecords<T>> {
-      if (this._page <= 1) {
-        throw new Error('Cannot load page 0')
-      }
-
-      this._page -= 1;
-      return this.list()
-    }
-
-    loadNext(): Promise<PaginatedRecords<T>> {
-      this._page += 1;
-      return this.list();
-    }*/
 
   /**
    * Return the Full URL based on filter, fields, page and page size

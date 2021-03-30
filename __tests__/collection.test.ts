@@ -1,5 +1,4 @@
-import { Collection } from '../src/collection';
-import { Filter, Operator } from '../src/types';
+import { Filter, Operator, Collection } from '../src';
 
 describe('Test Collection', () => {
   const collectionId = 'test';
@@ -83,7 +82,7 @@ describe('Test Collection', () => {
   });
 
   it('Should return the base url', () => {
-    const expectedUrl = `collections/${collectionId}?page=1&pageSize=20`;
+    const expectedUrl = `collections/${collectionId}/records?page=1&pageSize=20`;
     expect(collection.url()).toEqual(expectedUrl);
   });
 });
