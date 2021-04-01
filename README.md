@@ -56,7 +56,87 @@ Collection class has the following method that can be used to build the actual r
  - `filterBy(fieldId, operator: Operator, value: string | number | boolean)` -> apply filtering
  - `search(searchValue: string)` -> apply search
 
-#### Example
+To create `Collection` instance that can work with the remote API you need to call
+
+```typescript
+const yourCollection = datafyCMS.collections<T>('your collection name')
+```
+
+`T` represents the shape of your collection.
+
+To retrieve records from a collection you need to call the `.list()` method
+
+```typescript
+const response = await datafyCMS.collections<T>('your collection name')
+  .list()
+
+// The response will look like this
+export interface Response<T> {
+  results: T[];
+  previous: string;
+  next: string;
+  count: number;
+}
+```
+
+To filter the records you need to call the `filterBy` method. The `filterBy` will accept the `fieldId` an `Operator` and the value
+
+Those are all the operators that you can work with
+```typescript
+export enum Operator {
+  EQ = 'eq',
+  GT = 'gt',
+  GTE = 'gte',
+  LT = 'lt',
+  LTE = 'lte',
+  ISNULL = 'isnull',
+  IN = 'in',
+}
+```
+
+### Work with Record
+
+To work with a specific record and perform:
+ - get
+ - update
+ - delete
+ - publish
+ - unpublish (draft mode)
+
+You need to create a `CollectionRecord` instance. The `CollectionRecord` can be created from `Collection` instance by calling the `record` method
+
+```typescript
+const recordIntance = datafyCMS.collections<T>('articls')
+  .fields(['title', 'price'])
+  .record('<RECORD_ID OR ANY SLUG_FIELD_VALUE>')
+```
+
+When you create a `CollectionRecord` from `Collection` instance all the `fields` that were set on `collection` are automatically transferred on `CollectionRecord` instance. 
+You can choose to override those by calling `fields([])` on `CollectionRecord` instance
+
+The `CollectionRecord` instance have the following methods.
+
+```typescript
+export class CollectionRecord<T> {
+  fields(fields: string[]): CollectionRecord  // Set what fields you want to get for this record
+
+  get(): Promise<T>                           // Getting the record from DatafyCMS API
+
+  update(value: T): Promise<T>                // Update the record with the value parameter
+
+  delete(): Promise<void>                     // Delete the record
+
+  publish(): Promise<T>                       // Publish the record
+
+  draft(): Promise<T>                         // UnPublish the record
+
+}
+```
+
+
+## Usage
+This section provides example on how to use this library
+
 Example of selecting only some fields, applying 2 filters and searching by a value
 In this example we have the Post resource, and we query the DatafyCMS API to retrieve only
 the fields `title` and `created_at` by filtering the `created_at` to be greater than `2020-10-20`
@@ -83,10 +163,14 @@ const response = await datafyCMS.collections<Post>('posts')
   .filterBy('views', Operator.LTE, 120)
   .search('search in the content post')
   .list()
-
 ```
 
-## Usage
-This section provides example on how to use this library
 
-<b>TBA</b>
+To get only one post
+
+```typescript
+const article = await datafyCMS.collections<Post>('posts')
+  .fields(['title', 'created_at', 'content', 'slug', 'meta_title'])
+  .record('this-is-my-slug-value or some record ID')
+  .get()
+```
