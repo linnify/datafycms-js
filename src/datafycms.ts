@@ -1,8 +1,14 @@
-import axios, { AxiosResponse, Method } from 'axios';
+import axios, { AxiosError, AxiosResponse, Method } from 'axios';
+import { ApiError } from './types';
 
 export const setup = (token: string): void => {
   DatafyCMS.setupAPI(token);
 };
+
+interface ApiErrorMessage {
+  detail: { [id: string]: unknown };
+  message: string;
+}
 
 export class DatafyCMS {
   private static API_TOKEN: string;
@@ -46,6 +52,15 @@ export class DatafyRequest {
       method,
       data,
       headers: DatafyCMS.authHeader(),
-    }).then((response: AxiosResponse<T>) => response.data);
+    })
+      .then((response: AxiosResponse<T>) => response.data)
+      .catch((response: AxiosError<ApiErrorMessage>) => {
+        const message = new ApiError();
+        message.status = response?.response?.status || 500;
+        message.message = response?.response?.data?.message || 'Something went wrong';
+        message.data = response.response?.data?.detail || {};
+
+        return Promise.reject(message);
+      });
   }
 }

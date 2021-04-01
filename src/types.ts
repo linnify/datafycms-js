@@ -37,3 +37,9 @@ export enum Operator {
   ISNULL = 'isnull',
   IN = 'in',
 }
+
+export class ApiError {
+  status: number;
+  message: string;
+  data?: { [id: string]: unknown };
+}

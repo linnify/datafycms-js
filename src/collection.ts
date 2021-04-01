@@ -30,7 +30,8 @@ export class Collection<T> extends DatafyRequest {
   }
 
   filterBy(fieldId: string, operator: Operator, value: boolean | number | string): Collection<T> {
-    this._filters.set(fieldId, new Filter(fieldId, operator, value));
+    const filterKey = `${fieldId}-${operator}`;
+    this._filters.set(filterKey, new Filter(fieldId, operator, value));
     return this;
   }
 
@@ -126,7 +127,7 @@ export class CollectionRecord<T> extends DatafyRequest {
 
     if (this._fields.length > 0) {
       const fields = this._fields.join(',');
-      url += `&datafy_fields=${fields}`;
+      url += `?datafy_fields=${fields}`;
     }
 
     return url;
@@ -136,7 +137,11 @@ export class CollectionRecord<T> extends DatafyRequest {
     return this.request<T>(this.url(), 'GET');
   }
 
-  async delete(): Promise<void> {
+  update(value: T): Promise<T> {
+    return this.request<T>(this.url(), 'PATCH', value);
+  }
+
+  delete(): Promise<void> {
     return this.request<void>(this.baseUrl(), 'DELETE');
   }
 
