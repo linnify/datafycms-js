@@ -1,4 +1,4 @@
-import { Filter, Operator, PaginatedRecords } from './types';
+import { Filter, Operator, PaginatedRecords, Sort, SortOperator } from './types';
 import { DatafyRequest } from './datafycms';
 
 export const collections = <T>(collection: string): Collection<T> => {
@@ -8,9 +8,11 @@ export const collections = <T>(collection: string): Collection<T> => {
 export class Collection<T> extends DatafyRequest {
   private _fields: string[] = [];
   private _filters: Map<string, Filter> = new Map([]);
+  private _sort: Map<string, Sort> = new Map([]);
   private _search: string;
   private _page = 1;
   private _pageSize = 20;
+  private _locale: string;
 
   private constructor(private collection: string) {
     super();
@@ -35,8 +37,18 @@ export class Collection<T> extends DatafyRequest {
     return this;
   }
 
+  sortBy(fieldId: string, operator: SortOperator): Collection<T> {
+    this._sort.set(fieldId, new Sort(fieldId, operator));
+    return this;
+  }
+
   search(search: string): Collection<T> {
     this._search = search;
+    return this;
+  }
+
+  localize(locale: string): Collection<T> {
+    this._locale = locale;
     return this;
   }
 
@@ -83,6 +95,13 @@ export class Collection<T> extends DatafyRequest {
       url += `&${filters}`;
     }
 
+    if (this._sort.size > 0) {
+      const sort = Array.from(this._sort.values())
+        .map((sort) => sort.getParam())
+        .join(',');
+      url += `&ordering=${sort}`;
+    }
+
     if (this._search) {
       url += `&search=${this._search}`;
     }
@@ -94,7 +113,7 @@ export class Collection<T> extends DatafyRequest {
    * Load resources based on current configuration
    */
   async list(): Promise<PaginatedRecords<T>> {
-    return this.request<PaginatedRecords<T>>(this.url(), 'GET');
+    return this.request<PaginatedRecords<T>>(this.url(), 'GET', null, this._locale);
   }
 
   async create(data: T): Promise<T> {

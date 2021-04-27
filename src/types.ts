@@ -38,6 +38,23 @@ export enum Operator {
   IN = 'in',
 }
 
+export class Sort {
+  constructor(private fieldId: string, private operator: SortOperator) {}
+
+  /**
+   * Return the query parameter for the API request
+   */
+  getParam(): string {
+    const operation = this.operator === SortOperator.ASC ? '' : '-';
+    return `${operation}${this.fieldId}`;
+  }
+}
+
+export enum SortOperator {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
 export class ApiError {
   status: number;
   message: string;

@@ -38,20 +38,27 @@ export class DatafyCMS {
  * Exposed only one method which is using axios for making the requests
  */
 export class DatafyRequest {
-  private readonly HOST = 'https://api.datafycms.com';
+  private readonly HOST = 'http://localhost:8000';
+  private readonly LOCALIZATION_HEADER = 'LOCALIZATION';
 
   /**
    * Make the HTTP Request to DatafyCMS API
    * @param url
    * @param method
    * @param data
+   * @param locale
    */
-  request<T>(url: string, method: Method, data?: unknown): Promise<T> {
+  request<T>(url: string, method: Method, data?: unknown, locale?: string): Promise<T> {
+    const headers = DatafyCMS.authHeader();
+    if (locale) {
+      headers[this.LOCALIZATION_HEADER] = locale;
+    }
+
     return axios({
       url: `${this.HOST}/${url}`,
       method,
       data,
-      headers: DatafyCMS.authHeader(),
+      headers,
     })
       .then((response: AxiosResponse<T>) => response.data)
       .catch((response: AxiosError<ApiErrorMessage>) => {
