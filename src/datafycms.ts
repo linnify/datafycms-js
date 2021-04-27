@@ -38,7 +38,7 @@ export class DatafyCMS {
  * Exposed only one method which is using axios for making the requests
  */
 export class DatafyRequest {
-  private readonly HOST = 'http://localhost:8000';
+  private readonly HOST = 'https://api.datafycms.com';
   private readonly LOCALIZATION_HEADER = 'LOCALIZATION';
 
   /**
